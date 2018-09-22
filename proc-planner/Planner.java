@@ -72,7 +72,9 @@ class Planner {
                 if (inp == '\n'){
                   proc = new Proc(name, Integer.parseInt(in), Integer.parseInt(duration));
                   queue.add(proc);
-                  //System.out.println("Name:"+proc.getName()+" In:"+proc.getIn()+" duration :"+proc.getDuration());
+                  //
+                  System.out.println("Name:"+proc.getName()+" In:"+proc.getIn()+" duration :"+proc.getDuration());
+                  //
                   name = "";
                   in = "";
                   duration = "";
@@ -113,7 +115,9 @@ class Planner {
       buff = random.nextInt(maxDuration) + 1;
       proc = new Proc("P"+i, t, buff);
       queue.add(proc);
-      //System.out.println("Name:"+proc.getName()+" In:"+proc.getIn()+" duration :"+proc.getDuration());
+      //
+      System.out.println("Name:"+proc.getName()+" In:"+proc.getIn()+" duration :"+proc.getDuration());
+      //
     }
     System.out.println("rInit-finished");
   }
@@ -127,10 +131,29 @@ class Planner {
   }
 }
 class Plan{
+  static int[] strsToInts(String args[]){
+    int nums[] = new int[3];
+    nums[0] = Integer.parseInt(args[0]);
+    nums[1] = Integer.parseInt(args[1]);
+    nums[2] = Integer.parseInt(args[2]);
+    return nums;
+  }
   public static void main(String args[]){
     Planner planner = new Planner();
-    //planner.plan(200,100,1000);
-    planner.plan("d1.queue");
+    if (args.length == 0) {
+      planner.plan(200,100,1000);
+    } else if (args.length == 1) {
+      planner.plan(args[0] + ".queue");
+    } else if (args.length == 3) {
+      try {
+        int nums[] = strsToInts(args);
+        planner.plan(nums[0],nums[1],nums[2]);
+      } catch(NumberFormatException ex){
+        System.out.println("wrong input: numbers are required");
+      }
+    } else {
+      System.out.println("wrong input: required either name of .queue or 3 ints");
+    }
     System.out.println("Run-finished");
   }
 }
