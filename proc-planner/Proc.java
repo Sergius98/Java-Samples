@@ -1,5 +1,5 @@
 class Proc {
-  private int in, left, duration, delay;
+  private int in, left, duration, delay, end;
   private String name;
   Proc(String _name, int _in, int _duration){
     this.name = _name;
@@ -11,7 +11,11 @@ class Proc {
       left -= quant;
   }
   public void setDelay(int curr) {
-    delay = curr - in + 1 - duration;
+    delay = curr - in - duration;
+    end = curr;
+  }
+  public int getFinal(){
+    return end;
   }
   public int getIn() {
     return in;

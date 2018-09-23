@@ -46,11 +46,13 @@ class Planner {
                   proc = new Proc(name, Integer.parseInt(in), Integer.parseInt(duration));
                   queue.add(proc);
                   //
-                  //System.out.println("Name:"+proc.getName()+" In:"+proc.getIn()+" duration :"+proc.getDuration());
+                  System.out.println("Name:"+proc.getName()+" In:"+proc.getIn()+" duration :"+proc.getDuration());
                   //
                   name = "";
                   in = "";
                   duration = "";
+
+                  inp = reader.read();
                   break;
                 }
                 duration += (char)inp;
@@ -124,6 +126,16 @@ class Planner {
     //System.out.println("Planner.save-finished");
   }
 
+  Proc getBest(ArrayList<Proc> line){
+    int shortest = 0;
+    for (int i = 1; i < line.size(); i++){
+      if (line.get(i).getLeft() < line.get(shortest).getLeft()){
+        shortest = i;
+      }
+    }
+    return line.remove(shortest);
+  }
+
   void reload(){
     //System.out.println("Planner.reload-called");
     Proc newP;
@@ -134,7 +146,7 @@ class Planner {
       newP = queue2.remove(0);
       load(newP, getMin(100, newP.getLeft()), false, queue3);
     } else if (!queue3.isEmpty()){
-      newP = queue3.remove(0);
+      newP = getBest(queue3);
       load(newP, newP.getLeft(), true, queue3);
     } else if (curr != nil){
       curr = nil;
@@ -146,6 +158,13 @@ class Planner {
   void execute(){
     //System.out.println("Planner.execute-called");
 
+
+
+    System.out.println("time = " + time);
+    System.out.println("name = " + curr.getName());
+    System.out.println("runtime = " + runtime);
+    System.out.println("quant = " + quant);
+    System.out.println(" ");
     time++;
     if (curr == nil){
       reload();
@@ -153,6 +172,7 @@ class Planner {
     runtime++;
     if (runtime >= quant){
       save();
+      reload();
     }
     //System.out.println("Planner.execute-finished");
   }
@@ -166,14 +186,13 @@ class Planner {
     quant = 0;
     runtime = 0;
     curr = nil;
-    while (!isEmpty()){
+    while ((!isEmpty())||(curr != nil)){
       if (!queue.isEmpty()){
         proc = queue.remove(0);
         int inTime = proc.getIn();
         while (inTime > time){
           execute();
         }
-
 
         if (curr == nil){
           load(proc, getMin(50,proc.getLeft()), false, queue2);
@@ -191,16 +210,35 @@ class Planner {
     }
     //System.out.println("Planner.root-finished");
   }
+  void printTable(){
+    Proc prc;
+    int i = 0,
+        delay = 0,
+        full = 0;
+    System.out.println("\nname| in  | fin |delay|full |duration");
+    while(i<finished.size()){
+      prc = finished.get(i);
+      delay += prc.getDelay();
+      full += prc.getFull();
+      System.out.format(prc.getName() + "  |%05d|%05d|%05d|%05d|%05d%n",
+        prc.getIn(), prc.getFinal(), prc.getDelay(), prc.getFull(), prc.getDuration());
+      i++;
+    }
+    System.out.println("\n average delay:"+ (delay/(i+1)));
+    System.out.println("\n average full:"+ (full/(i+1)));
+  }
   public void plan(String fileName){
     //System.out.println("Planner.plan-called");
     fInit(fileName);
     root();
+    printTable();
     //System.out.println("Planner.plan-finished");
   }
   public void plan(int maxDuration, int maxDelay, int num){
     //System.out.println("Planner.plan-called");
     rInit(maxDuration, maxDelay, num);
     root();
+    printTable();
     //System.out.println("Planner.plan-finished");
   }
 }
