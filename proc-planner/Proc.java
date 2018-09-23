@@ -7,11 +7,8 @@ class Proc {
     this.left = _duration;
     this.duration = _duration;
   }
-  public void dec(){
-      in -= 1;
-  }
-  public void setLeft(int quant){
-      left -= quant
+  public void dec(int quant){
+      left -= quant;
   }
   public void setDelay(int curr) {
     delay = curr - in + 1 - duration;

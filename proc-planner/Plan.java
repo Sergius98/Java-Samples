@@ -7,7 +7,7 @@ class Plan{
     return nums;
   }
   public static void main(String args[]){
-  System.out.println("Run-started");
+  //System.out.println("Plan.main-started");
     Planner planner = new Planner();
     if (args.length == 0) {
       planner.plan(200,100,1000);
@@ -23,6 +23,6 @@ class Plan{
     } else {
       System.out.println("wrong input: required either name of .queue or 3 ints");
     }
-    System.out.println("Run-finished");
+    //System.out.println("Plan.main-finished");
   }
 }

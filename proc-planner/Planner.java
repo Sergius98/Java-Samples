@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.Random;
 
 class Planner {
-  int now = 0,
-      runtime = 0,
+  int runtime = 0,
       time = 0,
       quant = 0;
-  Proc curr;
+  Proc curr,
+       nil = new Proc("nil", 0, 0);
   boolean interruptible = false,
           free = true;
   ArrayList<Proc> queue = new ArrayList<Proc>(),
@@ -88,86 +88,100 @@ class Planner {
       proc = new Proc("P"+i, t, buff);
       queue.add(proc);
       //
-      //System.out.println("Name:"+proc.getName()+" In:"+proc.getIn()+" duration :"+proc.getDuration());
+      System.out.println("Name:"+proc.getName()+" In:"+proc.getIn()+" duration :"+proc.getDuration());
       //
     }
     //System.out.println("Planner.rInit-finished");
   }
-  public load(Proc proc, int _quant, boolean state,ArrayList<Proc> next){
+  void load(Proc proc, int _quant, boolean state, ArrayList<Proc> next){
     curr = proc;
-    now = _quant;
+    quant = _quant;
     interruptible = state;
     interrupted = next;
     runtime = 0;
   }
-  public finish(){
-    int rest = curr.getLeft - runtime - 1;
-    if (rest == 0) {
-      curr.setDelay(time + 1);
-      finished.add(curr);
-    } else {
-      curr.setLeft(runtime)
-      interrupted.add(curr)
+  int getMin(int a1, int a2){
+    if (a1 >= a2){
+      return a2;
     }
+    return a1;
   }
-  public reload(Proc proc, int _quant, boolean state,ArrayList<Proc> next){
-    finish();
-    load(proc, _quant, state, next);
-  }
-  public void execute(){
-    System.out.println("Planner.execute-called");
-    if (now <= 0){
-      if (queue1.lenght != 0){
-        load(queue1.remove(0), 50, false, queue2);
-      } else if (queue2.lenght != 0){
-        load(queue2.remove(0), 100, false, queue3);
-      } else if (queue3.lenght != 0){
-        int left = queue3.get(0).getLeft();
-        load(queue3.remove(0), left, true, queue3);
-      } else if (curr.left() > runtime) {
-        finish();
-      }
-    }else if (now == 1){
-      if (queue1.lenght != 0){
-        reload(queue1.remove(0), 50, false, queue2);
-      } else if (queue2.lenght != 0){
-        reload(queue2.remove(0), 100, false, queue3);
-      } else if (queue3.lenght != 0){
-        int left = queue3.get(0).getLeft();
-        reload(queue3.remove(0), left, true, queue3);
+  void save(){
+    //System.out.println("Planner.save-called");
+    if (curr != nil){
+      int rest = curr.getLeft() - runtime;
+      if (rest == 0) {
+        curr.setDelay(time);
+        finished.add(curr);
       } else {
-        finish();
+        curr.dec(runtime);
+        interrupted.add(curr);
       }
-    } else {
-      now--;
-      runtime++;
+      curr = nil;
     }
-    System.out.println("Planner.execute-finished");
+    quant = 0;
+    runtime = 0;
+    //System.out.println("Planner.save-finished");
+  }
+
+  void reload(){
+    //System.out.println("Planner.reload-called");
+    Proc newP;
+    if (!queue1.isEmpty()){
+      newP = queue1.remove(0);
+      load(newP, getMin(50, newP.getLeft()), false, queue2);
+    } else if (!queue2.isEmpty()){
+      newP = queue2.remove(0);
+      load(newP, getMin(100, newP.getLeft()), false, queue3);
+    } else if (!queue3.isEmpty()){
+      newP = queue3.remove(0);
+      load(newP, newP.getLeft(), true, queue3);
+    } else if (curr != nil){
+      curr = nil;
+      quant = 0;
+      runtime = 0;
+    }
+    //System.out.println("Planner.reload-finished");
+  }
+  void execute(){
+    //System.out.println("Planner.execute-called");
+
+    time++;
+    if (curr == nil){
+      reload();
+    }
+    runtime++;
+    if (runtime >= quant){
+      save();
+    }
+    //System.out.println("Planner.execute-finished");
   }
   boolean isEmpty(){
     return queue.isEmpty() && queue1.isEmpty() && queue2.isEmpty() && queue3.isEmpty();
   }
   void root(){
-    System.out.println("Planner.root-called");
+    //System.out.println("Planner.root-called");
     Proc proc;
     time = 0;
-    now = 0;
     quant = 0;
     runtime = 0;
     curr = nil;
     while (!isEmpty()){
       if (!queue.isEmpty()){
         proc = queue.remove(0);
-        while (proc.getIn() < time){
+        int inTime = proc.getIn();
+        while (inTime > time){
           execute();
         }
-        if (curr == nil) {
-          load(proc, 50, false, queue2);
-        } else if (interruptible && (proc.getLeft - runtime > proc)){
+
+
+        if (curr == nil){
+          load(proc, getMin(50,proc.getLeft()), false, queue2);
+        } else if (interruptible && (proc.getLeft() - runtime > proc.getLeft())){
           save();
-          load(proc, 50, false, queue2);
+          load(proc, getMin(50,proc.getLeft()), false, queue2);
         } else {
-          queue2.add(proc);
+          queue1.add(proc);
         }
       } else {
         while(curr != nil){
@@ -175,7 +189,7 @@ class Planner {
         }
       }
     }
-    System.out.println("Planner.root-finished");
+    //System.out.println("Planner.root-finished");
   }
   public void plan(String fileName){
     //System.out.println("Planner.plan-called");
