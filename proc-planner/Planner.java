@@ -157,13 +157,11 @@ class Planner {
   }
   void execute(){
     //System.out.println("Planner.execute-called");
-
-
-
-    System.out.println("time = " + time);
+    System.out.println("start time = " + time);
     System.out.println("name = " + curr.getName());
     System.out.println("runtime = " + runtime);
     System.out.println("quant = " + quant);
+    System.out.println("interruptible = " + interruptible);
     System.out.println(" ");
     time++;
     if (curr == nil){
@@ -174,6 +172,13 @@ class Planner {
       save();
       reload();
     }
+    System.out.println("finish time = " + time);
+    System.out.println("name = " + curr.getName());
+    System.out.println("runtime = " + runtime);
+    System.out.println("quant = " + quant);
+    System.out.println("interruptible = " + interruptible);
+    System.out.println(" ");
+
     //System.out.println("Planner.execute-finished");
   }
   boolean isEmpty(){
@@ -193,10 +198,17 @@ class Planner {
         while (inTime > time){
           execute();
         }
-
+        /*System.out.println("time = " + time);
+        System.out.println("name = " + curr.getName());
+        System.out.println("runtime = " + runtime);
+        System.out.println("quant = " + quant);
+        System.out.println("interruptible = " + interruptible);
+        System.out.println("curr.getLeft() - runtime = " + (curr.getLeft() - runtime));
+        System.out.println("proc.getLeft() = " + proc.getLeft());
+        System.out.println(" ");*/
         if (curr == nil){
           load(proc, getMin(50,proc.getLeft()), false, queue2);
-        } else if (interruptible && (proc.getLeft() - runtime > proc.getLeft())){
+        } else if (interruptible && (curr.getLeft() - runtime > proc.getLeft())){
           save();
           load(proc, getMin(50,proc.getLeft()), false, queue2);
         } else {
