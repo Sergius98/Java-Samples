@@ -2,13 +2,14 @@ import java.util.ArrayList;
 import java.io.FileReader;
 import java.io.IOException;
 
-class SchedulerM1 {
+class SchedulerM2 {
   ArrayList<Branch> line = new ArrayList<Branch>();
+  ArrayList<Branch> finished = new ArrayList<Branch>();
+  ArrayList<Branch> delayed = new ArrayList<Branch>();
   ArrayList<Integer> order = new ArrayList<Integer>();
   Proc proc1 = new Proc("P1"),
        proc2 = new Proc("P2"),
        proc3 = new Proc("P3");
-  Vars status = new Vars();
   int time = 0;
   boolean isFree(){
     if (proc1.free && proc2.free && proc3.free){
@@ -40,7 +41,7 @@ class SchedulerM1 {
     proc.runtime++;
     if (proc.runtime == proc.quant) {
       proc.free = true;
-      setStatus(proc.branch, false);
+      finished.add(proc.branch);
     }
     System.out.println("-- "+proc.name + "(" + proc.runtime + "/" + proc.quant +")");
   }
@@ -51,42 +52,51 @@ class SchedulerM1 {
     executeProc(proc2);
     executeProc(proc3);
   }
-  void setStatus(Branch br, Boolean stat){
-    status.lockedA[br.ai][br.aj] = stat;
-    status.lockedB[br.bi][br.bj] = stat;
-    status.lockedC[br.ci][br.cj] = stat;
-  }
+
   void auto(){
     Branch curr;
     Proc proc;
     while(true){
       //System.out.println("while(true)");
-      while(!line.isEmpty()) {
+      while((!line.isEmpty())||(!delayed.isEmpty())) {
         //System.out.println("while(!line.isEmpty())");
         while(isBusy()){
           //System.out.println("isBusy()");
           execute();
         }
         int l = 0;
-        while (l< line.size()){
+        while (l< delayed.size()){
           //System.out.println("while (l< line.size())");
           //System.out.println(l + "<" + line.size());
-          curr = line.remove(0);
-          if ((!status.lockedA[curr.ai][curr.aj])&&
-          (!status.lockedB[curr.bi][curr.bj])&&
-          (!status.lockedC[curr.ci][curr.cj])){
+          curr = delayed.get(l);
+          if (curr.isReady(finished)){
             //System.out.println("if (!locked)");
-            setStatus(curr, true);
+            curr = delayed.remove(l);
             push(curr);
             l--;
             break;
           }
           l++;
-          line.add(curr);
         }
-        if(l >= line.size()){
-          //System.out.println("if(l+1 == line.size())");
-          execute();
+        if(l >= delayed.size()){
+          int l2 = 0;
+          while (l2< line.size()){
+            //System.out.println("while (l< line.size())");
+            //System.out.println(l + "<" + line.size());
+            curr = line.remove(0);
+            if (curr.isReady(finished)){
+              //System.out.println("if (!locked)");
+              push(curr);
+              l2--;
+              break;
+            }
+            l2++;
+            delayed.add(curr);
+          }
+          if(l2 >= line.size()){
+            //System.out.println("if(l+1 == line.size())");
+            execute();
+          }
         }
       }
       if(isFree()){
@@ -102,15 +112,12 @@ class SchedulerM1 {
     proc.branch = curr;
     proc.runtime = 0;
     proc.free = false;
-    if(status.emptyC[curr.ci][curr.cj]){
-      proc.quant = 4;
-      status.emptyC[curr.ci][curr.cj] = false;
+    if(curr.isAdd){
+      proc.quant = 1;
     }else{
-      proc.quant = 5;
+      proc.quant = 4;
     }
-    System.out.println("Z(A[" + curr.ai + "][" + curr.aj +
-     "]; B[" + curr.bi + "][" + curr.bj +
-     "]; C[" + curr.ci + "][" + curr.cj + "]) is loaded to " + proc.name);
+    System.out.println("Z(" + curr.name + ") is loaded to " + proc.name);
   }
   void handy(){
     Branch curr;
@@ -130,12 +137,25 @@ class SchedulerM1 {
   }
 
   void lineInit(int im, int jm, int km){
-    Branch branch;
+    Branch branch, add, prev;
     for (int i = 0; i<im; i++){
       for (int j = 0; j<jm; j++){
-        for (int k = 0; k <km; k++){
-          branch = new Branch(i,k,k,j,i,j);
+        if (km > 1){
+          branch = new Branch(i,0,0,j,i,j);
+          //System.out.println(branch.name);
           line.add(branch);
+          prev = branch;
+          for (int k = 1; k <km; k++){
+            branch = new Branch(i,k,k,j,i,j);
+            //System.out.println(branch.name);
+            line.add(branch);
+            add = new Branch(prev);
+            add.push(branch);
+            add.name += ")";
+            //System.out.println(add.name);
+            line.add(add);
+            prev = add;
+          }
         }
       }
     }
@@ -144,10 +164,11 @@ class SchedulerM1 {
     try (FileReader reader = new FileReader(fileName)){
       time = 0;
       line = new ArrayList<Branch>();
+      delayed = new ArrayList<Branch>();
+      finished = new ArrayList<Branch>();
       proc1 = new Proc("P1");
       proc2 = new Proc("P2");
       proc3 = new Proc("P3");
-      status = new Vars();
       String buff="";
       int inp = reader.read();
       while(inp != -1){
@@ -173,16 +194,18 @@ class SchedulerM1 {
     System.out.println("test" +name +" functioning capacity(for [3][3] x [3][3]) = " + (spead / 3));
   }
   void run(){
-    double base_time = 3*3*2*5 + 3*3*4;//for 3x3x3
-    System.out.println("M1");
+    //double base_time = 2*2*1*5 + 2*2*1*4;//for 2x2x2
+    double base_time = 3*3*2*5 + 3*3*1*4;//for 3x3x3
+    //double base_time = 4*4*3*5 + 4*4*1*4;//for 4x4x4
+    System.out.println("M2");
     System.out.println("test1");
     lineInit(3,3,3);
     auto();
     int test1_time = time,
         test1_deadtime = proc1.deadtime + proc2.deadtime + proc3.deadtime;
-    System.out.println("M1");
+    System.out.println("M2");
     System.out.println("test2");
-    handyInit("ex1");
+    handyInit("ex2");
     lineInit(3,3,3);
     handy();
     int test2_time = time,
