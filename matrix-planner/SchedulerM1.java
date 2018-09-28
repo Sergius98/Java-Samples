@@ -1,7 +1,10 @@
 import java.util.ArrayList;
+import java.io.FileReader;
+import java.io.IOException;
 
 class SchedulerM1 {
   ArrayList<Branch> line = new ArrayList<Branch>();
+  ArrayList<Integer> order = new ArrayList<Integer>();
   Proc proc1 = new Proc("P1"),
        proc2 = new Proc("P2"),
        proc3 = new Proc("P3");
@@ -102,20 +105,77 @@ class SchedulerM1 {
       execute();
     }
   }
+  void handy(){
+    Branch curr;
+    Proc proc;
+    while(true){
+      while(!order.isEmpty()) {
+        while(isBusy()){
+          execute();
+        }
+        curr = line.get(order.remove(0));
+        proc = getFree();
+        proc.branch = curr;
+        proc.runtime = 0;
+        proc.free = false;
+        if(status.emptyC[curr.ci][curr.cj]){
+          proc.quant = 4;
+          status.emptyC[curr.ci][curr.cj] = false;
+        }else{
+          proc.quant = 5;
+        }
+        System.out.println("Z(A[" + curr.ai + "][" + curr.aj +
+         "]; B[" + curr.bi + "][" + curr.bj +
+         "]; C[" + curr.ci + "][" + curr.cj + "]) is loaded to " + proc.name);
+      }
+      if(isFree()){
+        break;
+      }
+      execute();
+    }
+  }
 
-  void autoInit(){
+  void lineInit(int im, int jm, int km){
     Branch branch;
-    for (int i = 0; i<3; i++){
-      for (int j = 0; j<3; j++){
-        for (int k = 0; k <3; k++){
+    for (int i = 0; i<im; i++){
+      for (int j = 0; j<jm; j++){
+        for (int k = 0; k <km; k++){
           branch = new Branch(i,k,k,j,i,j);
           line.add(branch);
         }
       }
     }
   }
+  void handyInit(String fileName){
+    try (FileReader reader = new FileReader(fileName)){
+      line = new ArrayList<Branch>();
+      proc1 = new Proc("P1");
+      proc2 = new Proc("P2");
+      proc3 = new Proc("P3");
+      status = new Vars();
+
+      String buff="";
+      int inp = reader.read();
+      while(inp != -1){
+        if (inp != '\n'){
+          buff += (char)inp;
+        } else {
+          order.add(Integer.parseInt(buff));
+          buff = "";
+        }
+        inp = reader.read();
+      }
+      //System.out.println(order.get(0));
+      reader.close();
+    } catch(IOException ex){
+      System.out.println(ex.getMessage());
+    }
+  }
   void run(){
-    autoInit();
+    lineInit(3,3,3);
     auto();
+    handyInit("ex1");
+    lineInit(3,3,3);
+    handy();
   }
 }
