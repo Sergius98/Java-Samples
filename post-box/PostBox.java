@@ -12,7 +12,7 @@ class PostBox{
     }
     Message answ = message;
     message = empty;
-    notifyAll();
+    notify();
     return answ;
   }
   public synchronized Message getResp(Message curr) {
@@ -26,7 +26,7 @@ class PostBox{
     }
     Message answ = message;
     message = empty;
-    notifyAll();
+    notify();
     return answ;
   }
   public synchronized void send(Message msg) {
@@ -39,6 +39,6 @@ class PostBox{
       }
     }
     message = msg;
-    notifyAll();
+    notify();
   }
 }

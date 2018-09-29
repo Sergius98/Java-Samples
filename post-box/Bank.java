@@ -23,6 +23,7 @@ class Bank extends Thread{
     for (int i = 0; i< num; i++){
       money = r.nextInt(_money);
       newClient(money);
+      _money = (int)(_money/2);
     }
   }
   public void setPostBox(PostBox _post){

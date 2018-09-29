@@ -14,7 +14,9 @@ class ATM extends Thread{
     money += rate*amount;
     banknotes.add(banknote);
   }
-
+  public void setMyLimit(int lm){
+    limit = lm;
+  }
   public void setMyName(String _name){
     name = _name;
   }
@@ -64,7 +66,7 @@ class ATM extends Thread{
     for (int i = 0; i<banknotes.size();i++){
       while ((sum >= banknotes.get(i).rate)&&(banknotes.get(i).amount>0)){
         sum -= banknotes.get(i).rate;
-        banknotes.get(i).amount++;
+        banknotes.get(i).amount--;
       }
       if (sum == 0){
         return true;
@@ -95,7 +97,7 @@ class ATM extends Thread{
         msg = new Message(name, curr);
         msg.client = r.nextInt(clients);
         msg.request = true;
-        msg.sum = r.nextInt(max_sum);
+        msg.sum = r.nextInt(max_sum) + 1;
         if (msg.sum > money){
           max_sum = (int)(max_sum / 2);
         }
@@ -109,13 +111,16 @@ class ATM extends Thread{
             msg.request = true;
             msg.response = false;
             msg.reduce = true;
+            printReq(msg);
             post.send(msg);
             msg = post.getResp(msg);
             if (msg.success){
               reduce(msg);
+              System.out.println(name + "->-" + msg.name + " cash has been withdrawn");
+              printCash();
             } else {
               System.out.println(name + "->-" + msg.name + " failed");
-
+              max_sum = (int)(max_sum / 2);
             }
           } else {
             System.out.println(name + "->-" + msg.name + "--there isn't enough cash");
@@ -125,6 +130,7 @@ class ATM extends Thread{
         curr++;
       }
     }
+    printCash();
     System.out.println(name + "(ATM) is stopped");
   }
 }

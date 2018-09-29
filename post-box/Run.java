@@ -3,7 +3,7 @@ class Run{
     ATM atm = new ATM();
     Bank bank = new Bank();
     int clients = 5;
-    int money = 3333;
+    int money = 48000;
     PostBox post = new PostBox();
     bank.setDaemon(true);
     atm.setClients(clients);
@@ -12,6 +12,7 @@ class Run{
     bank.setMyName("BANK");
     atm.setPostBox(post);
     bank.setPostBox(post);
+    atm.setMyLimit(20);
     atm.start();
     bank.start();
   }
