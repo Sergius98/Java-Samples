@@ -12,7 +12,7 @@ class Run{
     bank.setMyName("BANK");
     atm.setPostBox(post);
     bank.setPostBox(post);
-    atm.setMyLimit(20);
+    atm.setMyLimit(30);
     atm.start();
     bank.start();
   }

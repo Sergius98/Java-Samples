@@ -130,7 +130,7 @@ class ATM extends Thread{
         curr++;
       }
     }
-    printCash();
     System.out.println(name + "(ATM) is stopped");
+    printCash();
   }
 }
