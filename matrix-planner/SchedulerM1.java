@@ -187,6 +187,7 @@ class SchedulerM1 {
     handy();
     int test2_time = time,
         test2_deadtime = proc1.deadtime + proc2.deadtime + proc3.deadtime;
+    System.out.println("M1");
     printOut("1", test1_time, test1_deadtime, base_time);
     printOut("2", test2_time, test2_deadtime, base_time);
   }
