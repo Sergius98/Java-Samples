@@ -1,6 +1,5 @@
 class CacheRecord{
   int obj,
-      addr;
-  Boolean modified = false,
-          valid = false;
+      addr = -1;
+  Boolean modified = false;
 }
