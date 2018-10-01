@@ -14,8 +14,8 @@ class Run {
       System.out.println("wrong arguments, try 'java Run 10 2'\nError:"+e);
       return;
     }
-    if (size <= 0){
-      System.out.println("wrong arguments, try 'java Run 10 2'");
+    if (size <= 1){
+      System.out.println("too little clasters, try 'java Run 10 2'");
       return;
     }
     if (size >= 65535){
