@@ -2,14 +2,14 @@ import java.util.Objects;
 import java.util.Scanner;
 class Run {
   public static void main(String args[]){
-    int size = 0, def = 0;
+    int size = 0, defects = 0;
     if (args.length != 2){
       System.out.println("wrong arguments, try 'java Run 10 2'");
       return;
     }
     try {
       size = Integer.parseInt(args[0]);// number of clasters
-      def = Integer.parseInt(args[1]);// number of defects
+      defects = Integer.parseInt(args[1]);// number of defects
     } catch (Exception e){
       System.out.println("wrong arguments, try 'java Run 10 2'\nError:"+e);
       return;
@@ -22,11 +22,11 @@ class Run {
       System.out.println("too many clasters, try 'java Run 10 2'");
       return;
     }
-    if (size <= def){
+    if (size <= defects){
       System.out.println("too many defects, try 'java Run 10 2'");
       return;
     }
-    Memmory memo = new Memmory(size);
+    Memmory memo = new Memmory(size, defects);
     String command = "", arg = "";
     Scanner scan = new Scanner(System.in);
     while (!Objects.equals(command,"quit")){
@@ -43,7 +43,7 @@ class Run {
         case "new":
           System.out.print("size: ");
           arg = scan.nextLine();
-          memo.new(Integer.parseInt(arg));//ask for name in new
+          memo.newFile(Integer.parseInt(arg), scan);//ask for name in new
           break;
         case "del":
           System.out.print("id: ");
@@ -53,7 +53,7 @@ class Run {
         case "inc":
           System.out.print("id: ");
           arg = scan.nextLine();
-          memo.inc(Integer.parseInt(arg));//ask for number of clasters in inc
+          memo.inc(Integer.parseInt(arg), scan);//ask for number of clasters in inc
           break;
         case "get":
           System.out.print("id: ");
