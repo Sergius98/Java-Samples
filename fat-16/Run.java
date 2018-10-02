@@ -30,41 +30,43 @@ class Run {
     String command = "", arg = "";
     Scanner scan = new Scanner(System.in);
     while (!Objects.equals(command,"quit")){
-      //memo.print();
-      System.out.println("print 'quit' to quit");
-      System.out.println("print 'new' to create file");
-      System.out.println("print 'del' to deleate file");
-      System.out.println("print 'inc' to increase file size");
-      System.out.println("print 'get' to search file in memmory");
-      System.out.println("print 'print' to print state of memmory");
-      System.out.print("command: ");
-      command = scan.nextLine();
-      switch (command) {
-        case "new":
-          System.out.print("size: ");
-          arg = scan.nextLine();
-          memo.newFile(Integer.parseInt(arg), scan);//ask for name in new
-          break;
-        case "del":
-          System.out.print("id: ");
-          arg = scan.nextLine();
-          memo.del(Integer.parseInt(arg));
-          break;
-        case "inc":
-          System.out.print("id: ");
-          arg = scan.nextLine();
-          memo.inc(Integer.parseInt(arg), scan);//ask for number of clasters in inc
-          break;
-        case "get":
-          System.out.print("id: ");
-          arg = scan.nextLine();
-          memo.get(Integer.parseInt(arg));
-          break;
-        case "print":
-          memo.print();
-          break;
+      try{
+        System.out.println("print 'quit' to quit");
+        System.out.println("print 'new' to create file");
+        System.out.println("print 'del' to deleate file");
+        System.out.println("print 'inc' to increase file size");
+        System.out.println("print 'get' to search file in memmory");
+        System.out.println("print 'print' to print state of memmory");
+        System.out.print("command: ");
+        command = scan.nextLine();
+        switch (command) {
+          case "new":
+            System.out.print("size: ");
+            arg = scan.nextLine();
+            memo.newFile(Integer.parseInt(arg), scan);//ask for name in new
+            break;
+          case "del":
+            System.out.print("id: ");
+            arg = scan.nextLine();
+            memo.del(Integer.parseInt(arg));
+            break;
+          case "inc":
+            System.out.print("id: ");
+            arg = scan.nextLine();
+            memo.inc(Integer.parseInt(arg), scan);//ask for number of clasters in inc
+            break;
+          case "get":
+            System.out.print("id: ");
+            arg = scan.nextLine();
+            memo.get(Integer.parseInt(arg));
+            break;
+          case "print":
+            memo.print();
+            break;
+        }
+      } catch (Exception e) {
+        System.out.println("Something went wrong\n\terror: " + e);
       }
-
     }
   }
 }

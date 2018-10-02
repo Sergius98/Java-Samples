@@ -69,10 +69,10 @@ class Memmory{
     }
     System.out.print("extension:");
     extension = scan.nextLine();
-    if (name.length() > 3){
-      name = name.substring(0,3);
+    if (extension.length() > 3){
+      extension = extension.substring(0,3);
     }
-    FileRecord file = new FileRecord(name, extension, size, giveMemmory(size));
+    FileRecord file = new FileRecord(files.size(), name, extension, size, giveMemmory(size));
     files.add(file);
   }
   void takeMemmory(int id){
@@ -110,7 +110,7 @@ class Memmory{
       return;
     }
     int size;
-    if (id <= 0){
+    if (id < 0){
       System.out.println("id is too small");
       return;
     }
@@ -128,15 +128,46 @@ class Memmory{
       System.out.println("memmory is too small");
       return;
     }
+    Date date = new Date();
     FileRecord buff = files.get(id);
     getLast(buff.start).id = giveMemmory(size);
     buff.size += size;
+    buff.lastTime = date;
+    buff.modifiedTime = date;
+  }
+  void printClasters(int start){
+    int next = start;
+    Claster buff = clasters.get(next);
+    while (next != 65535){
+      buff = clasters.get(next);
+      System.out.printf("|{_%05d_}=[%5d]", next, buff.id);
+      next = buff.id;
+      }
+    System.out.println();
   }
   void get(int id){
-
+    if (id < 0){
+      System.out.println("id is too small");
+      return;
+    }
+    if (id >= files.size()){
+      System.out.println("id is too big");
+      return;
+    }
+    Date date = new Date();
+    FileRecord buff = files.get(id);
+    buff.lastTime = date;
+    buff.print(id);
+    printClasters(buff.start);
   }
   void print(){
     int max = clasters.size()/5;
+    System.out.println("\nfiles:");
+    FileRecord.printHeader();
+    for (int i = 0; i < files.size(); i++){
+      files.get(i).print(i);
+    }
+    System.out.println("\nclasters:\n{ addr}=[   id]");
     for (int i = 0; i < max; i++){
       System.out.printf("{%5d}=[%05d]|", (i*5), clasters.get((i*5)).id);
       System.out.printf("{%5d}=[%05d]|", 1+(i*5), clasters.get(1+(i*5)).id);
@@ -147,6 +178,6 @@ class Memmory{
     for (int i = max*5; i < clasters.size(); i++){
       System.out.printf("{%5d}=[%05d]|", i, clasters.get(i).id);
     }
-    System.out.println();
+    System.out.println("\n");
   }
 }

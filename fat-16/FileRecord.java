@@ -15,16 +15,27 @@ class FileRecord{
   int start;            //Номер початкового кластера FAT
   int size;             //Розмір файла in clasters
 
-  FileRecord(String _name, String _extension, int _size, int _start){
+  FileRecord(int id, String _name, String _extension, int _size, int _start){
     Date date = new Date();
-    SimpleDateFormat form = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
     createdTime = date;
     lastTime = date;
     modifiedTime = date;
-    System.out.println(form.format(date));
     name = _name;
     extension = _extension;
     size = _size;
     start = _start;
+    print(id);
+  }
+  static void printHeader(){
+    System.out.printf("%12s|%8s|%10s|%8s|%10s|%8s|%10s|%n", "name", "cr_time", "creat_date", "lastTime", "Last_date", "mod_time", "mod_date");
+  }
+  void print(int id){
+    SimpleDateFormat time = new SimpleDateFormat("hh:mm:ss");
+    SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy");
+    System.out.printf("%5d|%8s.%3s|", id, name, extension);
+    System.out.printf("%8s|%10s|", time.format(createdTime), date.format(createdTime));
+    System.out.printf("%8s|%10s|", time.format(lastTime), date.format(lastTime));
+    System.out.printf("%8s|%10s|", time.format(modifiedTime), date.format(modifiedTime));
+    System.out.printf("%5d|%5d|%n", start, size);
   }
 }
